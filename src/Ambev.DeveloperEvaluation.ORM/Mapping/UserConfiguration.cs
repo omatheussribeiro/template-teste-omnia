@@ -27,5 +27,20 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasConversion<string>()
             .HasMaxLength(20);
 
+        const string AdminHash = "$2a$12$2yY7o1a0EXEMPLOEXEMPLOEXEMPLOEXEMPLOEXEMPLOEXEMPLOqV6";
+
+        builder.HasData(
+            new User
+            {
+                Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                Username = "admin",
+                Password = AdminHash,
+                Email = "admin@ambev.com",
+                Phone = "11999999999",
+                Status = Domain.Enums.UserStatus.Active,
+                Role = Domain.Enums.UserRole.Admin
+            }
+        );
+
     }
 }
