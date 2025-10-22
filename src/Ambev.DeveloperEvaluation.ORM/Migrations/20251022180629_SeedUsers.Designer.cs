@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Ambev.DeveloperEvaluation.ORM.Migrations
+namespace Ambev.DeveloperEvaluation.WebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241014011203_InitialMigrations")]
-    partial class InitialMigrations
+    [Migration("20251022180629_SeedUsers")]
+    partial class SeedUsers
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,6 +31,9 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -57,6 +60,9 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -65,6 +71,19 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("bf0bfee6-58ab-485b-bbbe-70b090d9c022"),
+                            CreatedAt = new DateTime(2025, 10, 22, 18, 6, 28, 698, DateTimeKind.Utc).AddTicks(4342),
+                            Email = "admin@ambev.com",
+                            Password = "admin123",
+                            Phone = "11999999999",
+                            Role = "Admin",
+                            Status = "Active",
+                            Username = "admin"
+                        });
                 });
 #pragma warning restore 612, 618
         }

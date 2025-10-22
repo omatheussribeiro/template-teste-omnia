@@ -1,5 +1,5 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Repositories;
-using Ambev.DeveloperEvaluation.ORM;
+using Ambev.DeveloperEvaluation.ORM; // AppDbContext
 using Ambev.DeveloperEvaluation.ORM.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +12,17 @@ public class InfrastructureModuleInitializer : IModuleInitializer
 {
     public void Initialize(WebApplicationBuilder builder)
     {
-        builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<DefaultContext>());
+        builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(
+                builder.Configuration.GetConnectionString("DefaultConnection"),
+                b => b.MigrationsAssembly("Ambev.DeveloperEvaluation.ORM")
+            )
+        );
+
+        builder.Services.AddHostedService<DbMigrationHostedService>();
+
+        builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<AppDbContext>());
+
         builder.Services.AddScoped<IUserRepository, UserRepository>();
     }
 }
