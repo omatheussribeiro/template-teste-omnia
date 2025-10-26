@@ -7,7 +7,7 @@ namespace Ambev.DeveloperEvaluation.Application.Users.DeleteUser;
 /// <summary>
 /// Handler for processing DeleteUserCommand requests
 /// </summary>
-public class DeleteUserHandler : IRequestHandler<DeleteUserCommand, DeleteUserResponse>
+public class DeleteUserHandler : IRequestHandler<DeleteUserCommand, DeleteUserResult>
 {
     private readonly IUserRepository _userRepository;
 
@@ -28,7 +28,7 @@ public class DeleteUserHandler : IRequestHandler<DeleteUserCommand, DeleteUserRe
     /// <param name="request">The DeleteUser command</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The result of the delete operation</returns>
-    public async Task<DeleteUserResponse> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
+    public async Task<DeleteUserResult> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
     {
         var validator = new DeleteUserValidator();
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
@@ -40,6 +40,6 @@ public class DeleteUserHandler : IRequestHandler<DeleteUserCommand, DeleteUserRe
         if (!success)
             throw new KeyNotFoundException($"User with ID {request.Id} not found");
 
-        return new DeleteUserResponse { Success = true };
+        return new DeleteUserResult { Success = true };
     }
 }
