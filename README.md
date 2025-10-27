@@ -118,6 +118,232 @@ update-database
 O EF Core criará automaticamente todas as tabelas (Users, Sales, SaleItems, etc.) com os mapeamentos definidos na camada ORM.
 ---
 
+## 🗂️ Postman Collection (importar)
+
+Como usar:
+
+> Abra o Postman → Import → cole o JSON abaixo.
+
+> Crie um Environment com as variáveis:
+```text
+baseUrl (ex: https://localhost:7181)
+```
+```text
+token (Seu JWT. Apenas o Token, sem Bearer)
+```
+Rode os requests na ordem (eles salvam saleId e itemId em variáveis automáticas).
+
+```text
+{
+  "info": {
+    "name": "Sales API - template-teste-omnia",
+    "_postman_id": "d7d0f6d0-0000-4444-8888-aaaa0000bbbb",
+    "description": "Coleção para testar os endpoints de Sales com regras de domínio (quantidade ≤ 20, descontos por quantidade, cancelamentos, etc).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 - Get Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "url": { "raw": "{{baseUrl}}/api/Auth", "host": ["{{baseUrl}}"], "path": ["api","Auth"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@ambev.com\",\n  \"password\": \"$2a$12$u9FSTREch8M2oM7brh7gIuwiWTr6bAGQmCGK4O7ztHZqweDJ5Pv/q\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201 CREATED', function(){ pm.response.to.have.status(201); });",
+              "var json = pm.response.json();",
+              "pm.environment.set('saleId', json.saleId);",
+              "pm.test('Tem saleId', function(){ pm.expect(json.saleId).to.exist; });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 - Create (OK)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "url": { "raw": "{{baseUrl}}/api/sales", "host": ["{{baseUrl}}"], "path": ["api","sales"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"saleNumber\": \"V-OK-0001\",\n  \"saleDate\": \"2025-03-01T12:00:00Z\",\n  \"clientId\": \"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\",\n  \"clientName\": \"Cliente Bom\",\n  \"branchId\": \"bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb\",\n  \"branchName\": \"Filial Centro\",\n  \"items\": [\n    { \"productId\": \"11111111-1111-1111-1111-111111111111\", \"productName\": \"Produto A\", \"unitPrice\": 100, \"quantity\": 4 },\n    { \"productId\": \"22222222-2222-2222-2222-222222222222\", \"productName\": \"Produto B\", \"unitPrice\": 50,  \"quantity\": 10 }\n  ]\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201 CREATED', function(){ pm.response.to.have.status(201); });",
+              "var json = pm.response.json();",
+              "pm.environment.set('saleId', json.saleId);",
+              "pm.test('Tem saleId', function(){ pm.expect(json.saleId).to.exist; });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Get by Id",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/sales/{{saleId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api","sales","{{saleId}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200 OK', function(){ pm.response.to.have.status(200); });",
+              "var json = pm.response.json();",
+              "// pega primeiro item NÃO cancelado como exemplo",
+              "const firstItem = (json.items || []).find(i => !i.isCancelled);",
+              "if(firstItem){ pm.environment.set('itemId', firstItem.id); }",
+              "pm.test('Tem itemId capturado', function(){ pm.expect(pm.environment.get('itemId')).to.exist; });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - List",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/sales?page=1&pageSize=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["api","sales"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "pageSize", "value": "10" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "04 - Update quantity (to 10)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/sales/{{saleId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api","sales","{{saleId}}"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"items\": [ { \"itemId\": \"{{itemId}}\", \"newQuantity\": 10 } ]\n}"
+        }
+      }
+    },
+    {
+      "name": "05 - Cancel item",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/sales/{{saleId}}/items/{{itemId}}/cancel",
+          "host": ["{{baseUrl}}"],
+          "path": ["api","sales","{{saleId}}","items","{{itemId}}","cancel"]
+        }
+      }
+    },
+    {
+      "name": "06 - Update cancelled item (expect 400/409)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/sales/{{saleId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api","sales","{{saleId}}"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"items\": [ { \"itemId\": \"{{itemId}}\", \"newQuantity\": 5 } ]\n}"
+        }
+      }
+    },
+    {
+      "name": "07 - Cancel sale",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/sales/{{saleId}}/cancel",
+          "host": ["{{baseUrl}}"],
+          "path": ["api","sales","{{saleId}}","cancel"]
+        }
+      }
+    },
+    {
+      "name": "08 - Post-cancel update (expect 400/409)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/sales/{{saleId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api","sales","{{saleId}}"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"items\": [ { \"itemId\": \"{{itemId}}\", \"newQuantity\": 3 } ]\n}"
+        }
+      }
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "event": [],
+  "variable": []
+}
+
+```
+---
+
 ## 🧾 Observações Finais
 
 Todos os Domain Events (ex.: SaleCreatedEvent, SaleModifiedEvent, SaleCancelledEvent, ItemCancelledEvent) são despachados automaticamente via MediatR após SaveChangesAsync.
