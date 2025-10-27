@@ -12,11 +12,13 @@ using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.GetSale;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
 {
     [ApiController]
     [Route("api/sales")]
+    [Authorize]
     public sealed class SalesController : ControllerBase
     {
         private readonly IMediator _mediator;

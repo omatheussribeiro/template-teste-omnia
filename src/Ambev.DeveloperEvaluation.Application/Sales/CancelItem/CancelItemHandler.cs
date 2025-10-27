@@ -14,7 +14,15 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CancelItem
             var sale = await _repo.GetByIdWithItemsAsync(request.SaleId, ct)
                        ?? throw new KeyNotFoundException("Venda não encontrada.");
 
-            sale.CancelItem(request.ItemId);
+            if (sale.Items is not null)
+            {
+                var item = sale.Items.Where(x => x.Id == request.ItemId).FirstOrDefault();
+
+                if (item is not null)
+                {
+                    item.Cancel();
+                }
+            }
 
             await _repo.UpdateAsync(sale, ct);
 
