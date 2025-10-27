@@ -56,6 +56,9 @@ Esses endpoints implementam todas as **regras de negócio do domínio**, como:
 - Bloqueio de alterações em vendas canceladas
 - Recalculo automático dos totais
 
+<img width="1330" height="872" alt="image" src="https://github.com/user-attachments/assets/51f5bd86-0149-4593-b806-e973c4aad7c0" />
+
+
 ---
 
 ## 🧰 Tecnologias e Pacotes
@@ -116,6 +119,10 @@ update-database
 ```
 
 O EF Core criará automaticamente todas as tabelas (Users, Sales, SaleItems, etc.) com os mapeamentos definidos na camada ORM.
+
+<img width="574" height="476" alt="image" src="https://github.com/user-attachments/assets/40a222c6-1d69-4b21-a200-0f1455669c11" />
+
+
 ---
 
 ## 🗂️ Postman Collection (importar)
@@ -342,6 +349,9 @@ Rode os requests na ordem (eles salvam saleId e itemId em variáveis automática
 }
 
 ```
+
+<img width="1919" height="841" alt="image" src="https://github.com/user-attachments/assets/a5a70770-21bd-4ddb-a13b-72b2ad960af5" />
+
 ---
 
 ## 🧾 Observações Finais
