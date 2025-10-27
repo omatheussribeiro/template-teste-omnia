@@ -14,13 +14,20 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CancelSale
             var sale = await _repo.GetByIdWithItemsAsync(request.SaleId, ct)
                        ?? throw new KeyNotFoundException("Venda não encontrada.");
 
-            foreach (var item in sale.Items)
+            sale.CancelSale(sale.Id);
+
+            if (sale.Items is not null)
             {
-                sale.CancelSale(item.Id);
+                foreach (var item in sale.Items)
+                {
+                    if (!item.IsCancelled)
+                    {
+                        item.Cancel();
+                    }
+                }
             }
 
             await _repo.UpdateAsync(sale, ct);
-            // SaveChangesAsync será chamado no nível do Unit of Work / Handler externo, caso tenha.
             return new CancelSaleResult { SaleId = sale.Id, Status = sale.Status.ToString() };
         }
     }

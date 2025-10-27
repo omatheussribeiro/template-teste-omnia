@@ -59,7 +59,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
 
             var qtySpec = new MaxQuantityPerProductSpecification();
             if (!qtySpec.IsSatisfiedBy(quantity))
-                throw new DomainException(qtySpec.ErrorMessage);
+                throw new ArgumentException(qtySpec.ErrorMessage);
 
             // Usa a política do domínio para definir o desconto
             var percent = discountService.GetDiscountPercent(quantity);
